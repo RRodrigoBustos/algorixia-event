@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AlgorixIA — Experiencia Interactiva | Conectando Vaca Muerta</title>
+<style>
+  :root {
+    --primary: #1a56db;
+    --primary-dark: #1e40af;
+    --primary-light: #3b82f6;
+    --accent: #f59e0b;
+    --accent-dark: #d97706;
+    --success: #10b981;
+    --danger: #ef4444;
+    --dark: #0f172a;
+    --dark-mid: #1e293b;
+    --gray: #64748b;
+    --light: #f1f5f9;
+    --white: #ffffff;
+    --erp-color: #7c3aed;
+    --crm-color: #0891b2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--dark);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .hidden { display: none !important; }
+
+  /* ===== SCREENS ===== */
+  .screen {
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    padding-bottom: 80px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .screen.active { display: flex; }
+  #registration { padding-bottom: 20px; }
+
+  /* ===== FLOATING NAV ===== */
+  .float-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--dark-mid);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: none;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    z-index: 1000;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .float-nav.visible { display: flex; }
+  .float-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    background: none;
+    color: var(--gray);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .float-nav-item .nav-icon { font-size: 20px; }
+  .float-nav-item.active {
+    color: var(--primary-light);
+    background: rgba(59,130,246,0.1);
+  }
+  .float-nav-item:hover { color: var(--white); }
+
+  /* ===== HEADER BAR ===== */
+  .header-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    margin-bottom: 16px;
+  }
+  .header-bar .back-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: var(--white);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .header-bar .back-btn:hover { background: rgba(255,255,255,0.2); }
+  .header-bar h2 { font-size: 18px; font-weight: 600; }
+
+  /* ===== REGISTRATION ===== */
+  #registration {
+    justify-content: center;
+    gap: 24px;
+  }
+  .reg-logo { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  .reg-logo span { color: var(--primary-light); }
+  .reg-subtitle { font-size: 14px; color: var(--gray); margin-top: 4px; }
+  .reg-event {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .reg-event strong { color: var(--accent); }
+  .form-group { display: flex; flex-direction: column; gap: 10px; }
+  .form-group input, .form-group select {
+    background: var(--dark-mid);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white);
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--primary-light); }
+  .form-group input::placeholder { color: var(--gray); }
+  .form-group select option { background: var(--dark-mid); color: var(--white); }
+
+  .btn {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .btn-primary { background: var(--primary); color: var(--white); }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-accent { background: var(--accent); color: var(--dark); }
+  .btn-accent:hover { background: var(--accent-dark); }
+  .btn-outline {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.2);
+    color: var(--white);
+  }
+  .btn-outline:hover { border-color: rgba(255,255,255,0.4); }
+
+  /* ===== MENU ===== */
+  #menu { gap: 16px; padding-top: 40px; }
+  .menu-welcome { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .menu-desc { font-size: 14px; color: var(--gray); margin-bottom: 16px; line-height: 1.5; }
+  .menu-card {
+    background: var(--dark-mid);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .menu-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .menu-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--dark-mid), rgba(245,158,11,0.08));
+  }
+  .menu-card.featured:hover {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px rgba(245,158,11,0.15);
+  }
+  .card-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .card-icon.blue { background: rgba(59,130,246,0.15); }
+  .card-icon.amber { background: rgba(245,158,11,0.15); }
+  .card-icon.green { background: rgba(16,185,129,0.15); }
+  .card-icon.purple { background: rgba(124,58,237,0.15); }
+  .card-content h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .card-content p { font-size: 13px; color: var(--gray); line-height: 1.4; }
+  .card-badge {
+    display: inline-block;
+    background: var(--accent); color: var(--dark);
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px;
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  /* ===== CHAT ===== */
+  .chat-container {
+    flex: 1; display: flex; flex-direction: column; gap: 12px;
+    overflow-y: auto; padding-bottom: 80px;
+  }
+  .chat-bubble {
+    max-width: 85%; padding: 12px 16px; border-radius: 16px;
+    font-size: 14px; line-height: 1.5; animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .chat-bubble.bot {
+    background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.08);
+    align-self: flex-start; border-bottom-left-radius: 4px;
+  }
+  .chat-bubble.user {
+    background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px;
+  }
+  .chat-bubble.system {
+    background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);
+    align-self: center; text-align: center; font-size: 13px; max-width: 95%;
+  }
+  .chat-bubble.typing {
+    background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.08);
+    align-self: flex-start; border-bottom-left-radius: 4px;
+    color: var(--gray);
+  }
+  .chat-input-area {
+    position: fixed; bottom: 56px; left: 0; right: 0;
+    background: var(--dark); border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 20px; display: flex; gap: 8px;
+    max-width: 480px; margin: 0 auto;
+  }
+  .chat-input-area input {
+    flex: 1; background: var(--dark-mid);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--white); padding: 12px 16px;
+    border-radius: 24px; font-size: 14px; outline: none;
+  }
+  .chat-input-area button {
+    background: var(--primary); border: none; color: var(--white);
+    width: 44px; height: 44px; border-radius: 50%;
+    font-size: 18px; cursor: pointer;
+  }
+  .chat-input-area button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ===== RESPONSE OPTIONS ===== */
+  .response-options { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .response-option {
+    background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3);
+    color: var(--white); padding: 12px 16px; border-radius: 12px;
+    font-size: 13px; line-height: 1.4; cursor: pointer;
+    transition: all 0.2s; text-align: left;
+  }
+  .response-option:hover { background: rgba(59,130,246,0.2); border-color: var(--primary-light); }
+  .response-option .opt-label {
+    font-weight: 700; color: var(--primary-light); font-size: 11px;
+    text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;
+  }
+
+  /* ===== GAME STATS ===== */
+  .game-stats { display: flex; gap: 12px; margin-bottom: 16px; }
+  .stat-box { flex: 1; background: var(--dark-mid); border-radius: 10px; padding: 12px; text-align: center; }
+  .stat-box .stat-val { font-size: 24px; font-weight: 800; }
+  .stat-box .stat-label { font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .stat-box.streak .stat-val { color: var(--accent); }
+  .stat-box.score .stat-val { color: var(--success); }
+
+  .game-scenario {
+    background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 20px; margin-bottom: 16px;
+  }
+  .scenario-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .scenario-header .level-badge {
+    background: rgba(245,158,11,0.15); color: var(--accent);
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;
+  }
+  .scenario-text { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.9); }
+  .scenario-client { font-weight: 600; color: var(--accent); }
+
+  .game-feedback {
+    padding: 16px; border-radius: 12px; margin-bottom: 16px;
+    font-size: 14px; line-height: 1.5; animation: fadeIn 0.3s ease;
+  }
+  .game-feedback.correct { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--success); }
+  .game-feedback.wrong { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--danger); }
+
+  /* ===== ERP+CRM ===== */
+  .erp-crm-header { display: flex; gap: 8px; margin-bottom: 16px; }
+  .system-tag {
+    padding: 6px 12px; border-radius: 8px; font-size: 11px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .system-tag.erp { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .system-tag.crm { background: rgba(8,145,178,0.15); color: #22d3ee; border: 1px solid rgba(8,145,178,0.3); }
+
+  .erp-crm-scenario {
+    background: var(--dark-mid); border-radius: 16px; overflow: hidden;
+    margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);
+  }
+  .erp-crm-scenario .scenario-top {
+    padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .erp-crm-scenario .scenario-top .context-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    color: var(--gray); letter-spacing: 0.5px; margin-bottom: 8px;
+  }
+  .erp-crm-scenario .scenario-top p { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.9); }
+
+  .data-panels {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: rgba(255,255,255,0.06);
+  }
+  .data-panel { padding: 14px; background: var(--dark-mid); }
+  .data-panel .panel-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .data-panel.erp-panel .panel-title { color: #a78bfa; }
+  .data-panel.crm-panel .panel-title { color: #22d3ee; }
+  .data-panel .data-item { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 4px; line-height: 1.4; }
+
+  .decision-question {
+    background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+    padding: 14px 16px; border-radius: 12px; margin-bottom: 12px;
+    font-size: 14px; font-weight: 600; color: var(--accent); text-align: center;
+  }
+
+  .erp-crm-options { display: flex; flex-direction: column; gap: 8px; }
+  .erp-crm-option {
+    background: var(--dark-mid); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 14px 16px; cursor: pointer;
+    transition: all 0.2s; text-align: left;
+  }
+  .erp-crm-option:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
+  .erp-crm-option .opt-systems { display: flex; gap: 6px; margin-bottom: 6px; }
+  .mini-tag { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+  .mini-tag.erp { background: rgba(124,58,237,0.2); color: #a78bfa; }
+  .mini-tag.crm { background: rgba(8,145,178,0.2); color: #22d3ee; }
+  .erp-crm-option .opt-text { font-size: 13px; line-height: 1.4; color: rgba(255,255,255,0.85); }
+
+  .erp-crm-feedback { padding: 16px; border-radius: 12px; margin-bottom: 16px; animation: fadeIn 0.3s ease; }
+  .erp-crm-feedback.correct { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); }
+  .erp-crm-feedback.wrong { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); }
+  .erp-crm-feedback .fb-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .erp-crm-feedback.correct .fb-title { color: var(--success); }
+  .erp-crm-feedback.wrong .fb-title { color: var(--danger); }
+  .erp-crm-feedback .fb-text { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.8); }
+  .flow-diagram {
+    margin-top: 12px; background: rgba(255,255,255,0.04); border-radius: 8px;
+    padding: 12px; font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.8;
+  }
+  .flow-diagram .flow-step { display: flex; align-items: center; gap: 8px; }
+
+  .results-card {
+    background: var(--dark-mid); border-radius: 16px; padding: 24px;
+    text-align: center; margin-bottom: 16px;
+  }
+  .results-score { font-size: 56px; font-weight: 900; color: var(--accent); }
+  .results-label { font-size: 14px; color: var(--gray); margin-top: 4px; }
+  .results-detail { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+  .results-detail .rd-item { text-align: center; }
+  .results-detail .rd-val { font-size: 20px; font-weight: 700; }
+  .results-detail .rd-lbl { font-size: 11px; color: var(--gray); text-transform: uppercase; }
+
+  .timer-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 16px; overflow: hidden; }
+  .timer-bar .timer-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.1s linear; }
+
+  .brand-footer {
+    text-align: center; padding: 20px 0; font-size: 12px;
+    color: var(--gray); margin-top: auto;
+  }
+  .brand-footer a { color: var(--primary-light); text-decoration: none; }
+
+  /* AI status indicator */
+  .ai-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+    padding: 4px 10px; border-radius: 20px; font-size: 11px;
+    color: var(--success); font-weight: 600; margin-left: auto;
+  }
+  .ai-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success); animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== REGISTRATION ==================== -->
+<div id="registration" class="screen active">
+  <div>
+    <div class="reg-logo">Algorix<span>IA</span></div>
+    <div class="reg-subtitle">Automatización · IA · Crecimiento</div>
+  </div>
+  <div class="reg-event">
+    <strong>5° Encuentro Conectando Vaca Muerta</strong><br>
+    Experiencia interactiva con IA, ERP y CRM para el ecosistema energético.
+  </div>
+  <div class="form-group">
+    <input type="text" id="reg-nombre" placeholder="Nombre" required>
+    <input type="text" id="reg-apellido" placeholder="Apellido" required>
+    <input type="tel" id="reg-whatsapp" placeholder="WhatsApp (ej: 299-5041179)">
+    <input type="email" id="reg-email" placeholder="Email" required>
+    <input type="text" id="reg-empresa" placeholder="Empresa">
+    <select id="reg-rol">
+      <option value="" disabled selected>Rol en la empresa</option>
+      <option value="Director/Gerente">Director / Gerente</option>
+      <option value="Jefe de área">Jefe de área</option>
+      <option value="Comercial/Ventas">Comercial / Ventas</option>
+      <option value="Operaciones">Operaciones</option>
+      <option value="Administración">Administración</option>
+      <option value="IT/Tecnología">IT / Tecnología</option>
+      <option value="RRHH">RRHH</option>
+      <option value="Emprendedor">Emprendedor</option>
+      <option value="Otro">Otro</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" id="btn-register" onclick="register()">Ingresar a la experiencia →</button>
+  <div class="brand-footer">
+    <a href="https://www.algorixia.com" target="_blank">www.algorixia.com</a>
+  </div>
+</div>
+
+<!-- ==================== MENU ==================== -->
+<div id="menu" class="screen">
+  <div>
+    <div class="menu-welcome" id="menu-greeting">¡Hola!</div>
+    <p class="menu-desc">Elegí una experiencia para descubrir cómo la IA transforma tu negocio en el ecosistema energético.</p>
+  </div>
+
+  <div class="menu-card featured" onclick="showScreen('erp-crm')">
+    <div class="card-icon purple">🎯</div>
+    <div class="card-content">
+      <div class="card-badge">⭐ Nuevo</div>
+      <h3>Desafío ERP + CRM</h3>
+      <p>Gestioná una empresa energética usando Vakko ERP y AlgorixIA CRM. ¿Podés tomar las decisiones correctas?</p>
+    </div>
+  </div>
+
+  <div class="menu-card" onclick="showScreen('agent')">
+    <div class="card-icon blue">🤖</div>
+    <div class="card-content">
+      <h3>Agente IA 24/7</h3>
+      <p>Chateá con un agente de IA real, entrenado con conocimiento del sector energético de Vaca Muerta.</p>
+    </div>
+  </div>
+
+  <div class="menu-card" onclick="showScreen('assistant')">
+    <div class="card-icon amber">💬</div>
+    <div class="card-content">
+      <h3>Respuestas Difíciles</h3>
+      <p>Recibí mensajes complicados de clientes y elegí la mejor respuesta entre 3 opciones.</p>
+    </div>
+  </div>
+
+  <div class="menu-card" onclick="showScreen('game')">
+    <div class="card-icon green">🏆</div>
+    <div class="card-content">
+      <h3>Juego de Quejas</h3>
+      <p>¿Podés mantener la calma y resolver quejas de clientes? Sumá puntos y rachas.</p>
+    </div>
+  </div>
+
+  <div class="brand-footer">
+    Powered by <strong>AlgorixIA</strong> · <a href="https://www.algorixia.com" target="_blank">algorixia.com</a>
+  </div>
+</div>
+
+<!-- ==================== ERP + CRM CHALLENGE ==================== -->
+<div id="erp-crm" class="screen">
+  <div class="header-bar">
+    <button class="back-btn" onclick="showScreen('menu')">←</button>
+    <h2>🎯 Desafío ERP + CRM</h2>
+  </div>
+  <div class="erp-crm-header">
+    <span class="system-tag erp">Vakko ERP</span>
+    <span class="system-tag crm">AlgorixIA CRM</span>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box score"><div class="stat-val" id="erp-score">0</div><div class="stat-label">Puntos</div></div>
+    <div class="stat-box streak"><div class="stat-val" id="erp-streak">0 🔥</div><div class="stat-label">Racha</div></div>
+    <div class="stat-box"><div class="stat-val" id="erp-round">1/6</div><div class="stat-label">Ronda</div></div>
+  </div>
+  <div class="timer-bar"><div class="timer-fill" id="erp-timer" style="width:100%"></div></div>
+  <div id="erp-crm-content"></div>
+</div>
+
+<!-- ==================== AGENT IA ==================== -->
+<div id="agent" class="screen">
+  <div class="header-bar">
+    <button class="back-btn" onclick="showScreen('menu')">←</button>
+    <h2>🤖 Agente IA 24/7</h2>
+    <div class="ai-badge"><div class="dot"></div>IA Real</div>
+  </div>
+  <div class="chat-container" id="agent-chat"></div>
+  <div class="chat-input-area" id="agent-input-area">
+    <input type="text" id="agent-input" placeholder="Escribí como si fueras un cliente..." onkeydown="if(event.key==='Enter')sendAgentMsg()">
+    <button id="agent-send-btn" onclick="sendAgentMsg()">➤</button>
+  </div>
+</div>
+
+<!-- ==================== RESPONSE ASSISTANT ==================== -->
+<div id="assistant" class="screen">
+  <div class="header-bar">
+    <button class="back-btn" onclick="showScreen('menu')">←</button>
+    <h2>💬 Respuestas Difíciles</h2>
+  </div>
+  <div class="chat-container" id="assist-chat"></div>
+</div>
+
+<!-- ==================== COMPLAINT GAME ==================== -->
+<div id="game" class="screen">
+  <div class="header-bar">
+    <button class="back-btn" onclick="showScreen('menu')">←</button>
+    <h2>🏆 Juego de Quejas</h2>
+  </div>
+  <div class="game-stats">
+    <div class="stat-box score"><div class="stat-val" id="game-score">0</div><div class="stat-label">Puntos</div></div>
+    <div class="stat-box streak"><div class="stat-val" id="game-streak">0 🔥</div><div class="stat-label">Racha</div></div>
+    <div class="stat-box"><div class="stat-val" id="game-round">1/5</div><div class="stat-label">Ronda</div></div>
+  </div>
+  <div id="game-content"></div>
+</div>
+
+<!-- ==================== FLOATING NAV ==================== -->
+<nav class="float-nav" id="float-nav">
+  <button class="float-nav-item" data-screen="erp-crm" onclick="showScreen('erp-crm')">
+    <span class="nav-icon">🎯</span>ERP+CRM
+  </button>
+  <button class="float-nav-item" data-screen="agent" onclick="showScreen('agent')">
+    <span class="nav-icon">🤖</span>Agente IA
+  </button>
+  <button class="float-nav-item" data-screen="assistant" onclick="showScreen('assistant')">
+    <span class="nav-icon">💬</span>Respuestas
+  </button>
+  <button class="float-nav-item" data-screen="game" onclick="showScreen('game')">
+    <span class="nav-icon">🏆</span>Quejas
+  </button>
+</nav>
+
+<script>
+// ===================================================================
+// CONFIG — API base URL (auto-detect or override)
+// ===================================================================
+// Supabase Edge Functions (vakko-erp project)
+const SUPABASE_URL = 'https://pgefstjsxwixqmbomsht.supabase.co/functions/v1';
+const API_CHAT = `${SUPABASE_URL}/event-chat`;
+const API_REGISTER = `${SUPABASE_URL}/event-register`;
+
+// ===================================================================
+// STATE
+// ===================================================================
+let currentUser = {};
+let contactId = null;
+let currentScreen = 'registration';
+let moduleInitialized = { 'erp-crm': false, agent: false, assistant: false, game: false };
+let chatHistory = []; // For AI agent conversation context
+
+// ===================================================================
+// API HELPERS
+// ===================================================================
+async function apiRegister(data) {
+  try {
+    const res = await fetch(`${API_REGISTER}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'register', data })
+    });
+    if (res.ok) {
+      const result = await res.json();
+      contactId = result.contactId;
+      console.log('GHL contact:', result.status, contactId);
+      return result;
+    }
+  } catch (e) { console.warn('Register API unavailable:', e.message); }
+  return null;
+}
+
+async function apiLog(actividad, detalle, puntos) {
+  if (!contactId) return;
+  try {
+    await fetch(`${API_REGISTER}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'log', data: { contactId, actividad, detalle, puntos } })
+    });
+  } catch (e) { console.warn('Log API unavailable:', e.message); }
+}
+
+async function apiChat(message) {
+  try {
+    const res = await fetch(`${API_CHAT}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, history: chatHistory })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.reply;
+    }
+  } catch (e) { console.warn('Chat API unavailable:', e.message); }
+  // Fallback to keyword matching if API unavailable
+  return fallbackResponse(message);
+}
+
+// ===================================================================
+// FALLBACK RESPONSES (when API is unavailable)
+// ===================================================================
+const fallbackResponses = [
+  { keywords: ['precio', 'costo', 'cuanto', 'cotiz', 'presupuesto'], response: '¡Gracias por tu interés! Para darte un presupuesto personalizado, necesito entender mejor tu operación. ¿Podés contarme qué tipo de servicio estás buscando y en qué zona de Vaca Muerta operás?' },
+  { keywords: ['servicio', 'hacen', 'ofrecen', 'trabaj'], response: 'En AlgorixIA trabajamos en 3 ejes: 1️⃣ Automatización comercial con IA (agentes 24/7), 2️⃣ Capacitación de equipos para adoptar IA, y 3️⃣ Integración ERP+CRM (Vakko + AlgorixIA CRM) para gestión 360°. ¿Cuál te interesa más?' },
+  { keywords: ['demo', 'prueba', 'ver', 'mostrar', 'reunión', 'reunion'], response: '¡Dale! Puedo agendarte una demo de 30 minutos con Rodrigo donde te muestra cómo funciona todo con datos reales del sector energético. ¿Qué día te queda mejor?' },
+  { keywords: ['erp', 'vakko', 'sistema', 'gestion'], response: 'Vakko ERP es nuestro sistema de gestión integrado, conectado con AlgorixIA CRM. Te permite ver inventario, órdenes de trabajo, facturación y seguimiento comercial en un solo flujo. ¿Querés ver cómo funciona?' },
+  { keywords: ['crm', 'algorixia', 'clientes', 'leads'], response: 'AlgorixIA CRM permite automatizar TODO el recorrido del cliente: desde que llega como lead hasta la post-venta. Combinado con Vakko ERP, tus vendedores saben exactamente qué pueden ofrecer y a quién.' },
+  { keywords: ['hola', 'buenas', 'buen dia', 'buenos dias'], response: '¡Hola! 👋 Soy el agente de IA de AlgorixIA. Estoy acá para ayudarte con cualquier consulta sobre automatización, IA y gestión para el sector energético. ¿En qué te puedo ayudar?' },
+  { keywords: ['ia', 'inteligencia', 'artificial', 'chatbot', 'bot'], response: 'Nuestros agentes de IA no son chatbots básicos — se entrenan con TU información: productos, precios, forma de hablar. Es como clonar a tu mejor vendedor para que atienda 24/7. ¿Querés ver una demo?' },
+  { keywords: ['vaca muerta', 'petrolero', 'oil', 'gas', 'energia'], response: 'El sector energético de Vaca Muerta es nuestro foco. Trabajamos con empresas de servicios, contratistas y proveedores que necesitan automatizar su gestión comercial y operativa. YPF ya usa IA para perforación autónoma acá. ¿Vos en qué área trabajás?' }
+];
+
+function fallbackResponse(msg) {
+  const lower = msg.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const match = fallbackResponses.find(r => r.keywords.some(k => lower.includes(k)));
+  return match ? match.response : '¡Interesante consulta! Para darte la mejor respuesta, voy a pedirle a nuestro equipo que se comunique con vos. ¿Hay algo más en lo que pueda ayudarte sobre automatización, ERP o CRM? 🤝';
+}
+
+// ===================================================================
+// NAVIGATION
+// ===================================================================
+function showScreen(id) {
+  // Don't re-initialize if switching back to same screen
+  const prevScreen = currentScreen;
+  currentScreen = id;
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  // Show/hide floating nav
+  const nav = document.getElementById('float-nav');
+  if (id === 'registration') {
+    nav.classList.remove('visible');
+  } else {
+    nav.classList.add('visible');
+    // Update active nav item
+    document.querySelectorAll('.float-nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.screen === id);
+    });
+  }
+
+  // Show/hide agent input area
+  document.getElementById('agent-input-area').style.display = (id === 'agent') ? 'flex' : 'none';
+
+  // Initialize modules only on first visit
+  if (!moduleInitialized[id]) {
+    moduleInitialized[id] = true;
+    if (id === 'erp-crm') initErpCrm();
+    if (id === 'agent') initAgent();
+    if (id === 'assistant') initAssistant();
+    if (id === 'game') initGame();
+  }
+}
+
+function register() {
+  const nombre = document.getElementById('reg-nombre').value.trim();
+  const apellido = document.getElementById('reg-apellido').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  if (!nombre || !apellido || !email) {
+    alert('Por favor completá nombre, apellido y email.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true;
+  btn.textContent = 'Registrando...';
+
+  currentUser = {
+    nombre, apellido,
+    whatsapp: document.getElementById('reg-whatsapp').value.trim(),
+    email,
+    empresa: document.getElementById('reg-empresa').value.trim(),
+    rol: document.getElementById('reg-rol').value
+  };
+
+  document.getElementById('menu-greeting').textContent = `¡Hola, ${nombre}!`;
+
+  // Register in GHL (async, don't block)
+  apiRegister(currentUser).then(() => {
+    apiLog('Registro', 'Completó registro en app interactiva', '');
+  });
+
+  showScreen('menu');
+}
+
+// ===================================================================
+// ERP + CRM CHALLENGE
+// ===================================================================
+const erpCrmScenarios = [
+  {
+    context: "Entra un lead nuevo desde la landing page. AlgorixIA CRM lo captura automáticamente: María López, gerenta de compras de PetroServ SRL, interesada en servicios de mantenimiento de wellheads.",
+    erpData: { title: "Vakko ERP", items: ["Stock válvulas: 23 unid.", "Técnicos disponibles: 3/8", "Último servicio PetroServ: hace 14 meses", "Deuda pendiente: $0"] },
+    crmData: { title: "AlgorixIA CRM", items: ["Lead score: 85/100", "Fuente: Google Ads", "Etapa: Nuevo lead", "Emails anteriores: 0"] },
+    question: "¿Cuál es la acción correcta para gestionar este lead?",
+    options: [
+      { text: "Enviar presupuesto genérico por email desde AlgorixIA CRM y esperar respuesta.", systems: ["crm"], correct: false },
+      { text: "Verificar disponibilidad en Vakko ERP, armar presupuesto personalizado y activar secuencia de seguimiento en AlgorixIA CRM.", systems: ["erp", "crm"], correct: true },
+      { text: "Asignar al técnico más cercano directamente desde el ERP sin contactar al lead.", systems: ["erp"], correct: false }
+    ],
+    feedback: {
+      correct: "¡Perfecto! La clave es usar AMBOS sistemas: Vakko te da la data operativa real (stock, técnicos, historial) y AlgorixIA CRM automatiza el seguimiento comercial personalizado.",
+      wrong: "La respuesta correcta era verificar en Vakko ERP + activar seguimiento en AlgorixIA CRM. Usar un solo sistema deja información valiosa sin aprovechar.",
+      flow: ["Lead entra por AlgorixIA CRM →", "Consulta stock/disponibilidad en Vakko →", "Arma presupuesto con datos reales →", "AlgorixIA CRM activa secuencia de nurturing"]
+    }
+  },
+  {
+    context: "Un cliente existente, TechDrill Argentina, llama furioso. Su pedido de 50 juntas de BOP lleva 5 días de retraso. El contacto está en AlgorixIA CRM como 'cliente activo VIP'.",
+    erpData: { title: "Vakko ERP", items: ["Orden #4521: 50 juntas BOP", "Estado: En tránsito (demorado)", "ETA real: 2 días más", "Alternativa: 30 unid. en depósito local"] },
+    crmData: { title: "AlgorixIA CRM", items: ["Cliente VIP desde 2022", "Facturación anual: USD 180K", "Último NPS: 8/10", "Tickets abiertos: 1 (este)"] },
+    question: "¿Cómo manejás esta situación integrando ambos sistemas?",
+    options: [
+      { text: "Enviar las 30 unidades del depósito local hoy vía ERP y notificar al cliente por AlgorixIA CRM que el resto llega en 2 días, activando seguimiento automático post-entrega.", systems: ["erp", "crm"], correct: true },
+      { text: "Responder por AlgorixIA CRM que el pedido está en camino y que tenga paciencia.", systems: ["crm"], correct: false },
+      { text: "Generar una orden nueva en el ERP por 50 unidades y cancelar la anterior.", systems: ["erp"], correct: false }
+    ],
+    feedback: {
+      correct: "¡Excelente! Solución rápida usando datos del ERP (stock alternativo en depósito) + comunicación proactiva y seguimiento automatizado desde AlgorixIA CRM.",
+      wrong: "La mejor jugada era enviar las 30 del depósito HOY (dato del ERP) y usar AlgorixIA CRM para notificar + activar seguimiento. Un cliente VIP de USD 180K no puede esperar.",
+      flow: ["AlgorixIA CRM alerta: cliente VIP con queja →", "Vakko muestra stock alternativo local →", "Despacho parcial inmediato (30 unid.) →", "AlgorixIA CRM notifica + agenda seguimiento"]
+    }
+  },
+  {
+    context: "Es fin de mes y necesitás cerrar ventas. AlgorixIA CRM muestra 12 oportunidades en etapa 'Propuesta enviada' que no respondieron hace más de 7 días. Vakko tiene un lote de 200 metros de caños API 5CT que necesitás rotar.",
+    erpData: { title: "Vakko ERP", items: ["Lote caños API 5CT: 200m", "Costo unitario: USD 85/m", "Días en stock: 45", "Margen mín. rentable: USD 95/m"] },
+    crmData: { title: "AlgorixIA CRM", items: ["Oportunidades abiertas: 12", "Sin respuesta >7 días: 12", "Pipeline total: USD 340K", "Tasa cierre histórica: 23%"] },
+    question: "¿Cómo combinás ERP y CRM para cerrar el mes?",
+    options: [
+      { text: "Hacer descuento masivo en caños desde el ERP y mandar email genérico a toda la base de AlgorixIA CRM.", systems: ["erp", "crm"], correct: false },
+      { text: "Filtrar en AlgorixIA CRM las oportunidades que incluyen caños, cruzar con margen del ERP, y enviar oferta personalizada con precio especial por cierre de stock.", systems: ["erp", "crm"], correct: true },
+      { text: "Llamar a las 12 oportunidades una por una manualmente sin consultar datos.", systems: [], correct: false }
+    ],
+    feedback: {
+      correct: "¡Crack! Cruzaste datos de inventario (ERP) con el pipeline comercial (CRM) para crear una oferta quirúrgica: solo a quienes les interesa, con un precio que respeta tu margen.",
+      wrong: "La jugada era CRUZAR datos: filtrar en AlgorixIA CRM quién necesita caños + ver en Vakko el margen mínimo = oferta personalizada y rentable.",
+      flow: ["AlgorixIA CRM filtra leads interesados en caños →", "Vakko calcula precio mín. rentable (USD 95/m) →", "Oferta personalizada con urgencia de stock →", "AlgorixIA CRM automatiza seguimiento y cierre"]
+    }
+  },
+  {
+    context: "Tu equipo de ventas informa que 3 empresas nuevas del sector fracking preguntaron por servicios de coiled tubing esta semana. Ninguna está cargada en el sistema todavía.",
+    erpData: { title: "Vakko ERP", items: ["Unidades coiled tubing: 2 operativas", "Agenda próx. 15 días: 60% ocupada", "Precio base servicio: USD 12.500", "Último mantenimiento: OK"] },
+    crmData: { title: "AlgorixIA CRM", items: ["Contactos sector fracking: 47", "Campaña activa: Ninguna", "Tasa conversión sector: 31%", "Template 'Bienvenida': disponible"] },
+    question: "¿Cómo onboardeás estos leads de forma eficiente?",
+    options: [
+      { text: "Cargar los 3 contactos en AlgorixIA CRM, enviar template de bienvenida, y crear oportunidades vinculadas a la disponibilidad real de coiled tubing desde Vakko.", systems: ["erp", "crm"], correct: true },
+      { text: "Agendar reuniones directamente sin cargar en ningún sistema.", systems: [], correct: false },
+      { text: "Cargar solo en el ERP como potenciales órdenes de trabajo.", systems: ["erp"], correct: false }
+    ],
+    feedback: {
+      correct: "¡Muy bien! Primero el CRM captura y nutre (AlgorixIA CRM), y al mismo tiempo el ERP te dice si realmente podés cumplir (agenda 60% ocupada = podés tomar 2-3 servicios más).",
+      wrong: "Lo ideal era cargar en AlgorixIA CRM (nurturing automatizado) + cruzar con Vakko (¿tenés capacidad real?). Sin CRM perdés seguimiento; sin ERP prometés lo que no podés cumplir.",
+      flow: ["Cargar leads en AlgorixIA CRM →", "Activar secuencia de bienvenida →", "Vakko confirma disponibilidad de equipos →", "AlgorixIA CRM crea oportunidad con datos operativos reales"]
+    }
+  },
+  {
+    context: "AlgorixIA CRM dispara una alerta: el NPS de tu cliente más grande, YPF Servicios, bajó de 9 a 6 en la última encuesta. Facturan USD 500K/año con vos.",
+    erpData: { title: "Vakko ERP", items: ["Órdenes YPF últ. 90 días: 8", "Entregas a tiempo: 5/8 (62%)", "Reclamos abiertos: 2", "Próx. factura: USD 45K (vence en 10 días)"] },
+    crmData: { title: "AlgorixIA CRM", items: ["NPS actual: 6 (era 9)", "Contacto clave: Ing. Ruiz", "Últ. interacción: hace 21 días", "Renovación contrato: en 60 días"] },
+    question: "¿Qué hacés con esta información cruzada?",
+    options: [
+      { text: "Esperar a la renovación del contrato para hablar del tema.", systems: [], correct: false },
+      { text: "Mandar una encuesta más detallada por AlgorixIA CRM para entender mejor.", systems: ["crm"], correct: false },
+      { text: "Resolver los 2 reclamos en Vakko, contactar al Ing. Ruiz personalmente con plan de acción concreto, y activar en AlgorixIA CRM una secuencia de retención antes de la renovación.", systems: ["erp", "crm"], correct: true }
+    ],
+    feedback: {
+      correct: "¡Impecable! El ERP te mostró la causa (62% entregas a tiempo + 2 reclamos abiertos) y el CRM te dio la urgencia (renovación en 60 días). Acción inmediata en ambos frentes.",
+      wrong: "La data era clarísima: Vakko mostraba el PROBLEMA (entregas tarde + reclamos) y AlgorixIA CRM la URGENCIA (renovación en 60 días). Esperar o encuestar cuando ya sabés la causa es perder tiempo.",
+      flow: ["AlgorixIA CRM alerta NPS bajo →", "Vakko revela causa raíz: entregas y reclamos →", "Resolver reclamos operativos YA →", "AlgorixIA CRM activa retención pre-renovación"]
+    }
+  },
+  {
+    context: "Lunes a la mañana. Necesitás planificar la semana del equipo comercial (4 vendedores). AlgorixIA CRM tiene el pipeline actualizado y Vakko tiene la capacidad operativa real.",
+    erpData: { title: "Vakko ERP", items: ["Capacidad semanal: 15 servicios", "Comprometidos: 9 servicios", "Disponible: 6 servicios", "Técnicos libres: 4/8"] },
+    crmData: { title: "AlgorixIA CRM", items: ["Oportunidades calientes: 8", "Propuestas pendientes: 14", "Citas agendadas: 5", "Leads nuevos sin asignar: 11"] },
+    question: "¿Cómo planificás la semana con estos datos?",
+    options: [
+      { text: "Que cada vendedor trabaje sus leads como siempre, sin mirar la capacidad operativa.", systems: ["crm"], correct: false },
+      { text: "Priorizar las 8 oportunidades calientes en AlgorixIA CRM, asegurando que solo se cierren hasta 6 servicios nuevos (capacidad real de Vakko), y asignar leads según disponibilidad.", systems: ["erp", "crm"], correct: true },
+      { text: "Frenar las ventas hasta que se libere más capacidad en el ERP.", systems: ["erp"], correct: false }
+    ],
+    feedback: {
+      correct: "¡Perfecto! Planificación inteligente: el CRM dice DÓNDE están las oportunidades, el ERP dice CUÁNTO podés absorber. Vender más de lo que podés cumplir es peor que no vender.",
+      wrong: "La clave era alinear ventas con capacidad: AlgorixIA CRM tiene 8 oportunidades calientes, pero Vakko solo puede absorber 6 servicios más.",
+      flow: ["AlgorixIA CRM muestra pipeline priorizado →", "Vakko define techo de capacidad (6 servicios) →", "Asignar vendedores a las 8 calientes →", "Cerrar máximo 6, nurturing al resto para próxima semana"]
+    }
+  }
+];
+
+let erpState = { score: 0, streak: 0, round: 0, timer: null, timeLeft: 30 };
+
+function initErpCrm() {
+  erpState = { score: 0, streak: 0, round: 0, timer: null, timeLeft: 30 };
+  updateErpStats();
+  apiLog('ERP+CRM', 'Inició Desafío ERP+CRM', '');
+  showErpRound();
+}
+
+function updateErpStats() {
+  document.getElementById('erp-score').textContent = erpState.score;
+  document.getElementById('erp-streak').textContent = erpState.streak + ' 🔥';
+  document.getElementById('erp-round').textContent = (erpState.round + 1) + '/' + erpCrmScenarios.length;
+}
+
+function startErpTimer() {
+  erpState.timeLeft = 30;
+  clearInterval(erpState.timer);
+  const fill = document.getElementById('erp-timer');
+  fill.style.width = '100%';
+  erpState.timer = setInterval(() => {
+    erpState.timeLeft -= 0.1;
+    fill.style.width = Math.max(0, (erpState.timeLeft / 30) * 100) + '%';
+    if (erpState.timeLeft <= 0) { clearInterval(erpState.timer); handleErpAnswer(-1); }
+  }, 100);
+}
+
+function showErpRound() {
+  if (erpState.round >= erpCrmScenarios.length) { showErpResults(); return; }
+  const s = erpCrmScenarios[erpState.round];
+  const container = document.getElementById('erp-crm-content');
+  let optionsHtml = s.options.map((o, i) => {
+    const tags = o.systems.map(sys => `<span class="mini-tag ${sys}">${sys === 'erp' ? 'ERP' : 'CRM'}</span>`).join('');
+    return `<div class="erp-crm-option" onclick="handleErpAnswer(${i})">
+      <div class="opt-systems">${tags || '<span class="mini-tag" style="background:rgba(255,255,255,0.1);color:var(--gray)">MANUAL</span>'}</div>
+      <div class="opt-text">${o.text}</div></div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="erp-crm-scenario">
+      <div class="scenario-top"><div class="context-label">📋 Situación</div><p>${s.context}</p></div>
+      <div class="data-panels">
+        <div class="data-panel erp-panel"><div class="panel-title">🟣 ${s.erpData.title}</div>${s.erpData.items.map(i => `<div class="data-item">${i}</div>`).join('')}</div>
+        <div class="data-panel crm-panel"><div class="panel-title">🔵 ${s.crmData.title}</div>${s.crmData.items.map(i => `<div class="data-item">${i}</div>`).join('')}</div>
+      </div>
+    </div>
+    <div class="decision-question">❓ ${s.question}</div>
+    <div class="erp-crm-options">${optionsHtml}</div>`;
+  updateErpStats();
+  startErpTimer();
+}
+
+function handleErpAnswer(idx) {
+  clearInterval(erpState.timer);
+  const s = erpCrmScenarios[erpState.round];
+  const correct = idx >= 0 && s.options[idx].correct;
+  const timeBonus = Math.round(erpState.timeLeft);
+  if (correct) { erpState.score += 100 + (timeBonus * 2); erpState.streak++; }
+  else { erpState.streak = 0; }
+  const flowHtml = s.feedback.flow.map(step => `<div class="flow-step">→ ${step}</div>`).join('');
+  document.getElementById('erp-crm-content').innerHTML = `
+    <div class="erp-crm-feedback ${correct ? 'correct' : 'wrong'}">
+      <div class="fb-title">${correct ? '✅ ¡Correcto!' + (erpState.streak > 1 ? ' Racha de ' + erpState.streak + '!' : '') : (idx < 0 ? '⏰ ¡Se acabó el tiempo!' : '❌ No era esa...')}</div>
+      <div class="fb-text">${correct ? s.feedback.correct : s.feedback.wrong}</div>
+      <div class="flow-diagram"><strong style="color:var(--accent)">Flujo ERP ↔ CRM:</strong><br>${flowHtml}</div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="nextErpRound()">${erpState.round + 1 < erpCrmScenarios.length ? 'Siguiente ronda →' : 'Ver resultados →'}</button>`;
+  updateErpStats();
+  apiLog('ERP+CRM', `Ronda ${erpState.round + 1}: ${correct ? 'Correcto' : 'Incorrecto'}`, erpState.score);
+}
+
+function nextErpRound() { erpState.round++; showErpRound(); }
+
+function showErpResults() {
+  const pct = Math.round((erpState.score / (erpCrmScenarios.length * 160)) * 100);
+  let nivel = pct >= 80 ? '🏆 Experto en Gestión 360°' : pct >= 60 ? '⭐ Buen Gestor' : pct >= 40 ? '📈 En Camino' : 'Principiante';
+  document.getElementById('erp-crm-content').innerHTML = `
+    <div class="results-card">
+      <div style="font-size:48px;margin-bottom:8px">🎯</div>
+      <div class="results-score">${erpState.score}</div>
+      <div class="results-label">puntos totales</div>
+      <div style="margin-top:12px;font-size:18px;font-weight:700;color:var(--accent)">${nivel}</div>
+      <div class="results-detail">
+        <div class="rd-item"><div class="rd-val" style="color:var(--success)">${Math.round(pct)}%</div><div class="rd-lbl">Efectividad</div></div>
+        <div class="rd-item"><div class="rd-val" style="color:var(--accent)">${erpState.streak}</div><div class="rd-lbl">Mejor racha</div></div>
+      </div>
+    </div>
+    <div style="background:var(--dark-mid);border-radius:16px;padding:20px;margin-bottom:16px;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.8)">
+      <strong style="color:var(--white)">¿Qué aprendimos?</strong><br><br>
+      Cuando el <span style="color:#a78bfa;font-weight:600">ERP (Vakko)</span> y el <span style="color:#22d3ee;font-weight:600">CRM (AlgorixIA CRM)</span> trabajan conectados, cada decisión se toma con datos reales.<br><br>
+      <strong>El ERP te dice qué podés hacer.</strong><br>
+      <strong>El CRM te dice a quién y cómo.</strong><br>
+      <strong>Juntos te dicen cuándo y por qué.</strong>
+    </div>
+    <button class="btn btn-accent" style="width:100%" onclick="moduleInitialized['erp-crm']=false;showScreen('erp-crm')">🔄 Jugar de nuevo</button>`;
+  apiLog('ERP+CRM', 'Finalizó desafío', erpState.score);
+}
+
+// ===================================================================
+// AGENT IA 24/7 (Real AI)
+// ===================================================================
+let agentBusy = false;
+
+function initAgent() {
+  const chat = document.getElementById('agent-chat');
+  chat.innerHTML = '';
+  chatHistory = [];
+  addBubble('agent-chat', 'bot', '👋 ¡Hola! Soy el agente de IA de AlgorixIA. Estoy entrenado con conocimiento real del sector energético de Vaca Muerta. Preguntame lo que quieras — precios, servicios, ERP, CRM, automatización...');
+  addBubble('agent-chat', 'system', '🧠 Este agente usa inteligencia artificial real. Cada respuesta se genera en el momento.');
+  apiLog('Agente IA', 'Inició chat con agente IA real', '');
+}
+
+async function sendAgentMsg() {
+  if (agentBusy) return;
+  const input = document.getElementById('agent-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+
+  addBubble('agent-chat', 'user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+
+  // Show typing indicator
+  agentBusy = true;
+  document.getElementById('agent-send-btn').disabled = true;
+  const typingId = addBubble('agent-chat', 'typing', '● ● ● escribiendo...');
+
+  // Call AI API
+  const reply = await apiChat(msg);
+
+  // Remove typing indicator and show response
+  document.getElementById(typingId)?.remove();
+  addBubble('agent-chat', 'bot', reply);
+  chatHistory.push({ role: 'assistant', content: reply });
+
+  agentBusy = false;
+  document.getElementById('agent-send-btn').disabled = false;
+  apiLog('Agente IA', `Msg: ${msg.substring(0, 50)}`, '');
+}
+
+function addBubble(containerId, type, text) {
+  const chat = document.getElementById(containerId);
+  const div = document.createElement('div');
+  const id = 'bubble-' + Date.now() + Math.random().toString(36).substr(2, 5);
+  div.id = id;
+  div.className = `chat-bubble ${type}`;
+  div.innerHTML = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return id;
+}
+
+// ===================================================================
+// RESPONSE ASSISTANT
+// ===================================================================
+const assistScenarios = [
+  {
+    message: '🗣️ "Miren, yo sé que la IA está de moda, pero para nuestra empresa no aplica. Nosotros somos del petróleo, no de tecnología."',
+    sender: 'Gerente de operaciones, 25 años en el sector',
+    options: [
+      { label: 'Empática + dato local', text: '"Entiendo perfecto, y en el sector petrolero hay mucho chamuyo con la IA. Pero mirá: YPF ya usa IA para perforación autónoma en Vaca Muerta. No es futuro, está pasando acá. ¿Querés que te cuente cómo lo están aplicando empresas como la tuya?"', best: true },
+      { label: 'Directa + beneficio', text: '"La IA no reemplaza el conocimiento petrolero, lo potencia. Imaginate que tu equipo comercial atienda consultas 24/7 sin contratar a nadie más."', best: false },
+      { label: 'Pregunta desafiante', text: '"¿Y cómo manejan hoy las consultas fuera de horario? ¿Cuántos leads se les escapan por no responder a tiempo?"', best: false }
+    ]
+  },
+  {
+    message: '🗣️ "Ya probamos con un chatbot el año pasado y fue un desastre. Los clientes se quejaban de que no entendía nada."',
+    sender: 'Directora comercial de empresa de servicios',
+    options: [
+      { label: 'Validar + diferenciar', text: '"Tenés toda la razón en desconfiar, los chatbots básicos son frustrantes. Lo que nosotros implementamos son agentes de IA entrenados con TU información: tus productos, tus precios, tu forma de hablar. Es como clonar a tu mejor vendedor."', best: true },
+      { label: 'Caso de éxito', text: '"Eso le pasó a varios clientes nuestros antes de trabajar con nosotros. La diferencia es que nuestros agentes se entrenan con datos reales de tu empresa. ¿Querés ver una demo?"', best: false },
+      { label: 'Técnica', text: '"Los chatbots de reglas son del 2018. Los agentes de IA actuales usan modelos de lenguaje que entienden contexto, intención y hasta el tono."', best: false }
+    ]
+  },
+  {
+    message: '🗣️ "Suena interesante pero ahora no es el momento, estamos a full con la temporada alta. Hablemos en 3 meses."',
+    sender: 'Jefe de compras, empresa de logística petrolera',
+    options: [
+      { label: 'Urgencia inteligente', text: '"Justamente porque estás a full es cuando más lo necesitás. Si en temporada alta se te escapan leads o tu equipo no da abasto, estás perdiendo plata ahora. ¿Y si arrancamos con algo chico, sin frenar nada?"', best: true },
+      { label: 'Agendar futuro', text: '"Perfecto, te agendo un follow-up para julio. Mientras tanto, te mando un caso de éxito del sector para que lo mires cuando puedas."', best: false },
+      { label: 'FOMO', text: '"Dale, pero tené en cuenta que tu competencia ya está implementando esto. En 3 meses vas a estar corriendo de atrás."', best: false }
+    ]
+  },
+  {
+    message: '🗣️ "¿Y esto cuánto sale? Porque no tenemos presupuesto para tecnología este trimestre."',
+    sender: 'Dueño de PyME de servicios para wellheads',
+    options: [
+      { label: 'ROI concreto', text: '"Antes del precio, dejame hacerte una pregunta: ¿cuántos clientes potenciales te contactan por mes y cuántos terminan comprando? Si hoy convertís el 10% y con automatización pasás al 20%, ¿cuánto representa en facturación? La inversión se paga sola."', best: true },
+      { label: 'Flexible', text: '"Tenemos planes desde opciones accesibles hasta implementaciones completas. Pero más que el precio, lo importante es entender cuánto te está costando NO tenerlo. ¿Hacemos un diagnóstico rápido gratis?"', best: false },
+      { label: 'Directa', text: '"Depende de lo que necesites. Pero si me decís que no tenés presupuesto para tecnología, la pregunta es si podés darte el lujo de seguir sin ella."', best: false }
+    ]
+  }
+];
+let assistIdx = 0;
+
+function initAssistant() {
+  assistIdx = 0;
+  document.getElementById('assist-chat').innerHTML = '';
+  addBubble('assist-chat', 'system', '💬 Te van a llegar mensajes difíciles de clientes reales del sector energético. Elegí la mejor respuesta entre las 3 opciones.');
+  apiLog('Respuestas', 'Inició asistente', '');
+  showAssistScenario();
+}
+
+function showAssistScenario() {
+  if (assistIdx >= assistScenarios.length) {
+    addBubble('assist-chat', 'system', '🏁 ¡Completaste todos los escenarios! Ahora tenés un arsenal de respuestas para las objeciones más comunes. Probá otra experiencia desde el menú de abajo.');
+    return;
+  }
+  const s = assistScenarios[assistIdx];
+  addBubble('assist-chat', 'bot', `<strong style="font-size:12px;color:var(--gray)">${s.sender}</strong><br><br>${s.message}`);
+  setTimeout(() => {
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'response-options';
+    s.options.forEach((opt, i) => {
+      const btn = document.createElement('div');
+      btn.className = 'response-option';
+      btn.innerHTML = `<div class="opt-label">${opt.label}</div>${opt.text}`;
+      btn.onclick = () => handleAssistChoice(i);
+      optionsDiv.appendChild(btn);
+    });
+    document.getElementById('assist-chat').appendChild(optionsDiv);
+    document.getElementById('assist-chat').scrollTop = 99999;
+  }, 500);
+}
+
+function handleAssistChoice(idx) {
+  const s = assistScenarios[assistIdx];
+  const chosen = s.options[idx];
+  document.querySelectorAll('.response-options').forEach(el => el.remove());
+  addBubble('assist-chat', 'user', chosen.text);
+  setTimeout(() => {
+    if (chosen.best) {
+      addBubble('assist-chat', 'system', '✅ ¡Excelente elección! Esa es la respuesta más efectiva.');
+    } else {
+      const best = s.options.find(o => o.best);
+      addBubble('assist-chat', 'system', `💡 Buena opción, pero la más efectiva era "${best.label}".`);
+    }
+    apiLog('Respuestas', `Escenario ${assistIdx + 1}: eligió "${chosen.label}"`, chosen.best ? 100 : 50);
+    assistIdx++;
+    setTimeout(showAssistScenario, 1000);
+  }, 600);
+}
+
+// ===================================================================
+// COMPLAINT GAME
+// ===================================================================
+const complaints = [
+  {
+    complaint: '"Hace 3 días que espero los repuestos y nadie me dice nada. Si no llegan mañana, busco otro proveedor."',
+    client: 'Carlos, jefe de mantenimiento — OilTech SRL',
+    options: [
+      { text: '"Carlos, entiendo tu frustración y tenés razón. Acabo de verificar tu pedido: está en camino y llega mañana antes de las 10. Te mando el tracking ahora y me quedo personalmente a cargo."', correct: true },
+      { text: '"Los tiempos de entrega están en el contrato. Llegan cuando llegan."', correct: false },
+      { text: '"Disculpá, no sé qué pasó. Voy a averiguar y te aviso."', correct: false }
+    ]
+  },
+  {
+    complaint: '"Me facturaron de más el mes pasado y ya reclamé 2 veces sin respuesta. Esto es una falta de respeto."',
+    client: 'Laura, administradora — PetroServ Neuquén',
+    options: [
+      { text: '"Laura, tenés toda la razón. Ya estoy mirando tu cuenta y veo la diferencia. Te genero la nota de crédito hoy mismo y te la mando por email antes de las 17hs."', correct: true },
+      { text: '"Pasame el número de factura y lo reviso."', correct: false },
+      { text: '"El área de facturación se encarga de eso, te paso el contacto."', correct: false }
+    ]
+  },
+  {
+    complaint: '"El técnico que mandaron no tenía idea de lo que hacía. Perdimos medio día de producción por esto."',
+    client: 'Martín, supervisor de planta — Drilling Solutions',
+    options: [
+      { text: '"Martín, eso es inaceptable y me hago cargo. Mañana a primera hora te mando a nuestro técnico senior con todo el equipo necesario sin costo adicional. ¿Qué equipo necesita servicio?"', correct: true },
+      { text: '"Nuestros técnicos están capacitados, seguramente fue un malentendido."', correct: false },
+      { text: '"Voy a hablar con el técnico y te comento."', correct: false }
+    ]
+  },
+  {
+    complaint: '"Me prometieron un precio especial por volumen y cuando llegó la factura era el precio de lista."',
+    client: 'Sebastián, gerente comercial — WellCo Services',
+    options: [
+      { text: '"Sebastián, si te dijimos un precio, es ese precio. Revisé tu acuerdo y tenés razón: el descuento no se aplicó. Te corrijo la factura hoy y lo cargo en el sistema para que no vuelva a pasar."', correct: true },
+      { text: '"Dejame verificar con el equipo comercial qué precio se había acordado."', correct: false },
+      { text: '"Los precios pueden variar según disponibilidad, quizás eso es lo que pasó."', correct: false }
+    ]
+  },
+  {
+    complaint: '"Llamo al servicio técnico y nadie atiende. Mando WhatsApp y me clavan el visto. Así no se puede trabajar."',
+    client: 'Andrea, coordinadora — FracNeuquén',
+    options: [
+      { text: '"Andrea, tenés razón y no hay excusa. A partir de ahora tenés mi número directo. Además, estamos implementando un agente de IA que responde 24/7 para que nunca más te quedes sin respuesta. ¿Querés que te cuente?"', correct: true },
+      { text: '"A veces hay mucha demanda y no damos abasto, disculpá."', correct: false },
+      { text: '"¿Probaste llamar en horario de oficina?"', correct: false }
+    ]
+  }
+];
+let gameState = { score: 0, streak: 0, round: 0 };
+
+function initGame() {
+  gameState = { score: 0, streak: 0, round: 0 };
+  updateGameStats();
+  apiLog('Juego Quejas', 'Inició juego', '');
+  showGameRound();
+}
+
+function updateGameStats() {
+  document.getElementById('game-score').textContent = gameState.score;
+  document.getElementById('game-streak').textContent = gameState.streak + ' 🔥';
+  document.getElementById('game-round').textContent = (gameState.round + 1) + '/' + complaints.length;
+}
+
+function showGameRound() {
+  if (gameState.round >= complaints.length) { showGameResults(); return; }
+  const c = complaints[gameState.round];
+  document.getElementById('game-content').innerHTML = `
+    <div class="game-scenario">
+      <div class="scenario-header"><span class="level-badge">Ronda ${gameState.round + 1}</span></div>
+      <p class="scenario-text"><span class="scenario-client">${c.client}</span></p>
+      <p class="scenario-text" style="margin-top:12px">${c.complaint}</p>
+    </div>
+    ${c.options.map((o, i) => `<div class="response-option" onclick="handleGameChoice(${i})" style="margin-bottom:8px">${o.text}</div>`).join('')}`;
+  updateGameStats();
+}
+
+function handleGameChoice(idx) {
+  const c = complaints[gameState.round];
+  const correct = c.options[idx].correct;
+  if (correct) { gameState.score += 100 + (gameState.streak * 20); gameState.streak++; }
+  else { gameState.streak = 0; }
+  document.getElementById('game-content').innerHTML = `
+    <div class="game-feedback ${correct ? 'correct' : 'wrong'}">
+      ${correct ? '✅ ¡Excelente respuesta!' + (gameState.streak > 1 ? ' 🔥 Racha de ' + gameState.streak : '') + ' — Empatía + solución concreta + acción inmediata.' : '❌ Esa respuesta puede escalar el conflicto. La clave: reconocer el problema, hacerse cargo y ofrecer solución con plazo definido.'}
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="nextGameRound()">${gameState.round + 1 < complaints.length ? 'Siguiente ronda →' : 'Ver resultados →'}</button>`;
+  updateGameStats();
+  apiLog('Juego Quejas', `Ronda ${gameState.round + 1}: ${correct ? 'OK' : 'FAIL'}`, gameState.score);
+}
+
+function nextGameRound() { gameState.round++; showGameRound(); }
+
+function showGameResults() {
+  const max = complaints.length * 100 + (complaints.length * (complaints.length - 1) / 2) * 20;
+  const pct = Math.round((gameState.score / max) * 100);
+  document.getElementById('game-content').innerHTML = `
+    <div class="results-card">
+      <div style="font-size:48px;margin-bottom:8px">🏆</div>
+      <div class="results-score">${gameState.score}</div>
+      <div class="results-label">puntos totales</div>
+      <div style="margin-top:16px;font-size:15px;color:rgba(255,255,255,0.7)">
+        ${pct >= 80 ? '¡Sos un experto en atención al cliente!' : pct >= 50 ? 'Buen manejo, seguí practicando.' : 'La empatía y la acción concreta son la clave.'}
+      </div>
+    </div>
+    <button class="btn btn-accent" style="width:100%" onclick="moduleInitialized['game']=false;showScreen('game')">🔄 Jugar de nuevo</button>`;
+  apiLog('Juego Quejas', 'Finalizó', gameState.score);
+}
+</script>
+</body>
+</html>
