@@ -463,14 +463,6 @@
     </div>
   </div>
 
-  <div class="menu-card" onclick="showScreen('assistant')">
-    <div class="card-icon amber">💬</div>
-    <div class="card-content">
-      <h3>Respuestas Difíciles</h3>
-      <p>Recibí mensajes complicados de clientes y elegí la mejor respuesta entre 3 opciones.</p>
-    </div>
-  </div>
-
   <div class="menu-card" onclick="showScreen('game')">
     <div class="card-icon green">🏆</div>
     <div class="card-content">
@@ -517,15 +509,6 @@
   </div>
 </div>
 
-<!-- ==================== RESPONSE ASSISTANT ==================== -->
-<div id="assistant" class="screen">
-  <div class="header-bar">
-    <button class="back-btn" onclick="showScreen('menu')">←</button>
-    <h2>💬 Respuestas Difíciles</h2>
-  </div>
-  <div class="chat-container" id="assist-chat"></div>
-</div>
-
 <!-- ==================== COMPLAINT GAME ==================== -->
 <div id="game" class="screen">
   <div class="header-bar">
@@ -548,9 +531,6 @@
   <button class="float-nav-item" data-screen="agent" onclick="showScreen('agent')">
     <span class="nav-icon">🤖</span>Agente IA
   </button>
-  <button class="float-nav-item" data-screen="assistant" onclick="showScreen('assistant')">
-    <span class="nav-icon">💬</span>Respuestas
-  </button>
   <button class="float-nav-item" data-screen="game" onclick="showScreen('game')">
     <span class="nav-icon">🏆</span>Quejas
   </button>
@@ -560,10 +540,9 @@
 // ===================================================================
 // CONFIG — API base URL (auto-detect or override)
 // ===================================================================
-// Supabase Edge Functions (vakko-erp project)
-const SUPABASE_URL = 'https://pgefstjsxwixqmbomsht.supabase.co/functions/v1';
-const API_CHAT = `${SUPABASE_URL}/event-chat`;
-const API_REGISTER = `${SUPABASE_URL}/event-register`;
+// Vercel API endpoints (same-origin)
+const API_CHAT = '/api/chat';
+const API_REGISTER = '/api/register';
 
 // ===================================================================
 // STATE
@@ -571,7 +550,7 @@ const API_REGISTER = `${SUPABASE_URL}/event-register`;
 let currentUser = {};
 let contactId = null;
 let currentScreen = 'registration';
-let moduleInitialized = { 'erp-crm': false, agent: false, assistant: false, game: false };
+let moduleInitialized = { 'erp-crm': false, agent: false, game: false };
 let chatHistory = []; // For AI agent conversation context
 
 // ===================================================================
@@ -672,7 +651,6 @@ function showScreen(id) {
     moduleInitialized[id] = true;
     if (id === 'erp-crm') initErpCrm();
     if (id === 'agent') initAgent();
-    if (id === 'assistant') initAssistant();
     if (id === 'game') initGame();
   }
 }
@@ -962,96 +940,6 @@ function addBubble(containerId, type, text) {
   return id;
 }
 
-// ===================================================================
-// RESPONSE ASSISTANT
-// ===================================================================
-const assistScenarios = [
-  {
-    message: '🗣️ "Miren, yo sé que la IA está de moda, pero para nuestra empresa no aplica. Nosotros somos del petróleo, no de tecnología."',
-    sender: 'Gerente de operaciones, 25 años en el sector',
-    options: [
-      { label: 'Empática + dato local', text: '"Entiendo perfecto, y en el sector petrolero hay mucho chamuyo con la IA. Pero mirá: YPF ya usa IA para perforación autónoma en Vaca Muerta. No es futuro, está pasando acá. ¿Querés que te cuente cómo lo están aplicando empresas como la tuya?"', best: true },
-      { label: 'Directa + beneficio', text: '"La IA no reemplaza el conocimiento petrolero, lo potencia. Imaginate que tu equipo comercial atienda consultas 24/7 sin contratar a nadie más."', best: false },
-      { label: 'Pregunta desafiante', text: '"¿Y cómo manejan hoy las consultas fuera de horario? ¿Cuántos leads se les escapan por no responder a tiempo?"', best: false }
-    ]
-  },
-  {
-    message: '🗣️ "Ya probamos con un chatbot el año pasado y fue un desastre. Los clientes se quejaban de que no entendía nada."',
-    sender: 'Directora comercial de empresa de servicios',
-    options: [
-      { label: 'Validar + diferenciar', text: '"Tenés toda la razón en desconfiar, los chatbots básicos son frustrantes. Lo que nosotros implementamos son agentes de IA entrenados con TU información: tus productos, tus precios, tu forma de hablar. Es como clonar a tu mejor vendedor."', best: true },
-      { label: 'Caso de éxito', text: '"Eso le pasó a varios clientes nuestros antes de trabajar con nosotros. La diferencia es que nuestros agentes se entrenan con datos reales de tu empresa. ¿Querés ver una demo?"', best: false },
-      { label: 'Técnica', text: '"Los chatbots de reglas son del 2018. Los agentes de IA actuales usan modelos de lenguaje que entienden contexto, intención y hasta el tono."', best: false }
-    ]
-  },
-  {
-    message: '🗣️ "Suena interesante pero ahora no es el momento, estamos a full con la temporada alta. Hablemos en 3 meses."',
-    sender: 'Jefe de compras, empresa de logística petrolera',
-    options: [
-      { label: 'Urgencia inteligente', text: '"Justamente porque estás a full es cuando más lo necesitás. Si en temporada alta se te escapan leads o tu equipo no da abasto, estás perdiendo plata ahora. ¿Y si arrancamos con algo chico, sin frenar nada?"', best: true },
-      { label: 'Agendar futuro', text: '"Perfecto, te agendo un follow-up para julio. Mientras tanto, te mando un caso de éxito del sector para que lo mires cuando puedas."', best: false },
-      { label: 'FOMO', text: '"Dale, pero tené en cuenta que tu competencia ya está implementando esto. En 3 meses vas a estar corriendo de atrás."', best: false }
-    ]
-  },
-  {
-    message: '🗣️ "¿Y esto cuánto sale? Porque no tenemos presupuesto para tecnología este trimestre."',
-    sender: 'Dueño de PyME de servicios para wellheads',
-    options: [
-      { label: 'ROI concreto', text: '"Antes del precio, dejame hacerte una pregunta: ¿cuántos clientes potenciales te contactan por mes y cuántos terminan comprando? Si hoy convertís el 10% y con automatización pasás al 20%, ¿cuánto representa en facturación? La inversión se paga sola."', best: true },
-      { label: 'Flexible', text: '"Tenemos planes desde opciones accesibles hasta implementaciones completas. Pero más que el precio, lo importante es entender cuánto te está costando NO tenerlo. ¿Hacemos un diagnóstico rápido gratis?"', best: false },
-      { label: 'Directa', text: '"Depende de lo que necesites. Pero si me decís que no tenés presupuesto para tecnología, la pregunta es si podés darte el lujo de seguir sin ella."', best: false }
-    ]
-  }
-];
-let assistIdx = 0;
-
-function initAssistant() {
-  assistIdx = 0;
-  document.getElementById('assist-chat').innerHTML = '';
-  addBubble('assist-chat', 'system', '💬 Te van a llegar mensajes difíciles de clientes reales del sector energético. Elegí la mejor respuesta entre las 3 opciones.');
-  apiLog('Respuestas', 'Inició asistente', '');
-  showAssistScenario();
-}
-
-function showAssistScenario() {
-  if (assistIdx >= assistScenarios.length) {
-    addBubble('assist-chat', 'system', '🏁 ¡Completaste todos los escenarios! Ahora tenés un arsenal de respuestas para las objeciones más comunes. Probá otra experiencia desde el menú de abajo.');
-    return;
-  }
-  const s = assistScenarios[assistIdx];
-  addBubble('assist-chat', 'bot', `<strong style="font-size:12px;color:var(--gray)">${s.sender}</strong><br><br>${s.message}`);
-  setTimeout(() => {
-    const optionsDiv = document.createElement('div');
-    optionsDiv.className = 'response-options';
-    s.options.forEach((opt, i) => {
-      const btn = document.createElement('div');
-      btn.className = 'response-option';
-      btn.innerHTML = `<div class="opt-label">${opt.label}</div>${opt.text}`;
-      btn.onclick = () => handleAssistChoice(i);
-      optionsDiv.appendChild(btn);
-    });
-    document.getElementById('assist-chat').appendChild(optionsDiv);
-    document.getElementById('assist-chat').scrollTop = 99999;
-  }, 500);
-}
-
-function handleAssistChoice(idx) {
-  const s = assistScenarios[assistIdx];
-  const chosen = s.options[idx];
-  document.querySelectorAll('.response-options').forEach(el => el.remove());
-  addBubble('assist-chat', 'user', chosen.text);
-  setTimeout(() => {
-    if (chosen.best) {
-      addBubble('assist-chat', 'system', '✅ ¡Excelente elección! Esa es la respuesta más efectiva.');
-    } else {
-      const best = s.options.find(o => o.best);
-      addBubble('assist-chat', 'system', `💡 Buena opción, pero la más efectiva era "${best.label}".`);
-    }
-    apiLog('Respuestas', `Escenario ${assistIdx + 1}: eligió "${chosen.label}"`, chosen.best ? 100 : 50);
-    assistIdx++;
-    setTimeout(showAssistScenario, 1000);
-  }, 600);
-}
 
 // ===================================================================
 // COMPLAINT GAME
