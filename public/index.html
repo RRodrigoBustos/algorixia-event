@@ -30,6 +30,16 @@
     color: var(--white);
     min-height: 100vh;
     overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -40px; left: -40px; right: -40px; bottom: -40px;
+    background: url('evento-bg.jpg') center/cover no-repeat;
+    filter: blur(30px) brightness(0.3);
+    z-index: -1;
+    opacity: 0.5;
   }
 
   .hidden { display: none !important; }
@@ -451,7 +461,7 @@
     <div class="card-content">
       <div class="card-badge">⭐ Nuevo</div>
       <h3>Desafío ERP + CRM</h3>
-      <p>Gestioná una empresa energética usando Vakko ERP y AlgorixIA CRM. ¿Podés tomar las decisiones correctas?</p>
+      <p>Gestioná una empresa energética usando un ERP y un CRM integrados. ¿Podés tomar las decisiones correctas?</p>
     </div>
   </div>
 
@@ -483,8 +493,8 @@
     <h2>🎯 Desafío ERP + CRM</h2>
   </div>
   <div class="erp-crm-header">
-    <span class="system-tag erp">Vakko ERP</span>
-    <span class="system-tag crm">AlgorixIA CRM</span>
+    <span class="system-tag erp">ERP</span>
+    <span class="system-tag crm">CRM</span>
   </div>
   <div class="game-stats">
     <div class="stat-box score"><div class="stat-val" id="erp-score">0</div><div class="stat-label">Puntos</div></div>
@@ -605,10 +615,10 @@ async function apiChat(message) {
 // ===================================================================
 const fallbackResponses = [
   { keywords: ['precio', 'costo', 'cuanto', 'cotiz', 'presupuesto'], response: '¡Gracias por tu interés! Para darte un presupuesto personalizado, necesito entender mejor tu operación. ¿Podés contarme qué tipo de servicio estás buscando y en qué zona de Vaca Muerta operás?' },
-  { keywords: ['servicio', 'hacen', 'ofrecen', 'trabaj'], response: 'En AlgorixIA trabajamos en 3 ejes: 1️⃣ Automatización comercial con IA (agentes 24/7), 2️⃣ Capacitación de equipos para adoptar IA, y 3️⃣ Integración ERP+CRM (Vakko + AlgorixIA CRM) para gestión 360°. ¿Cuál te interesa más?' },
+  { keywords: ['servicio', 'hacen', 'ofrecen', 'trabaj'], response: 'En AlgorixIA trabajamos en 3 ejes: 1️⃣ Automatización comercial con IA (agentes 24/7), 2️⃣ Capacitación de equipos para adoptar IA, y 3️⃣ Integración ERP+CRM para gestión 360°. ¿Cuál te interesa más?' },
   { keywords: ['demo', 'prueba', 'ver', 'mostrar', 'reunión', 'reunion'], response: '¡Dale! Puedo agendarte una demo de 30 minutos con Rodrigo donde te muestra cómo funciona todo con datos reales del sector energético. ¿Qué día te queda mejor?' },
-  { keywords: ['erp', 'vakko', 'sistema', 'gestion'], response: 'Vakko ERP es nuestro sistema de gestión integrado, conectado con AlgorixIA CRM. Te permite ver inventario, órdenes de trabajo, facturación y seguimiento comercial en un solo flujo. ¿Querés ver cómo funciona?' },
-  { keywords: ['crm', 'algorixia', 'clientes', 'leads'], response: 'AlgorixIA CRM permite automatizar TODO el recorrido del cliente: desde que llega como lead hasta la post-venta. Combinado con Vakko ERP, tus vendedores saben exactamente qué pueden ofrecer y a quién.' },
+  { keywords: ['erp', 'sistema', 'gestion'], response: 'ERP es nuestro sistema de gestión integrado, conectado con CRM. Te permite ver inventario, órdenes de trabajo, facturación y seguimiento comercial en un solo flujo. ¿Querés ver cómo funciona?' },
+  { keywords: ['crm', 'algorixia', 'clientes', 'leads'], response: 'CRM permite automatizar TODO el recorrido del cliente: desde que llega como lead hasta la post-venta. Combinado con ERP, tus vendedores saben exactamente qué pueden ofrecer y a quién.' },
   { keywords: ['hola', 'buenas', 'buen dia', 'buenos dias'], response: '¡Hola! 👋 Soy el agente de IA de AlgorixIA. Estoy acá para ayudarte con cualquier consulta sobre automatización, IA y gestión para el sector energético. ¿En qué te puedo ayudar?' },
   { keywords: ['ia', 'inteligencia', 'artificial', 'chatbot', 'bot'], response: 'Nuestros agentes de IA no son chatbots básicos — se entrenan con TU información: productos, precios, forma de hablar. Es como clonar a tu mejor vendedor para que atienda 24/7. ¿Querés ver una demo?' },
   { keywords: ['vaca muerta', 'petrolero', 'oil', 'gas', 'energia'], response: 'El sector energético de Vaca Muerta es nuestro foco. Trabajamos con empresas de servicios, contratistas y proveedores que necesitan automatizar su gestión comercial y operativa. YPF ya usa IA para perforación autónoma acá. ¿Vos en qué área trabajás?' }
@@ -691,99 +701,99 @@ function register() {
 // ===================================================================
 const erpCrmScenarios = [
   {
-    context: "Entra un lead nuevo desde la landing page. AlgorixIA CRM lo captura automáticamente: María López, gerenta de compras de PetroServ SRL, interesada en servicios de mantenimiento de wellheads.",
-    erpData: { title: "Vakko ERP", items: ["Stock válvulas: 23 unid.", "Técnicos disponibles: 3/8", "Último servicio PetroServ: hace 14 meses", "Deuda pendiente: $0"] },
-    crmData: { title: "AlgorixIA CRM", items: ["Lead score: 85/100", "Fuente: Google Ads", "Etapa: Nuevo lead", "Emails anteriores: 0"] },
+    context: "Entra un lead nuevo desde la landing page. CRM lo captura automáticamente: María López, gerenta de compras de PetroServ SRL, interesada en servicios de mantenimiento de wellheads.",
+    erpData: { title: "ERP", items: ["Stock válvulas: 23 unid.", "Técnicos disponibles: 3/8", "Último servicio PetroServ: hace 14 meses", "Deuda pendiente: $0"] },
+    crmData: { title: "CRM", items: ["Lead score: 85/100", "Fuente: Google Ads", "Etapa: Nuevo lead", "Emails anteriores: 0"] },
     question: "¿Cuál es la acción correcta para gestionar este lead?",
     options: [
-      { text: "Enviar presupuesto genérico por email desde AlgorixIA CRM y esperar respuesta.", systems: ["crm"], correct: false },
-      { text: "Verificar disponibilidad en Vakko ERP, armar presupuesto personalizado y activar secuencia de seguimiento en AlgorixIA CRM.", systems: ["erp", "crm"], correct: true },
+      { text: "Enviar presupuesto genérico por email desde CRM y esperar respuesta.", systems: ["crm"], correct: false },
+      { text: "Verificar disponibilidad en ERP, armar presupuesto personalizado y activar secuencia de seguimiento en CRM.", systems: ["erp", "crm"], correct: true },
       { text: "Asignar al técnico más cercano directamente desde el ERP sin contactar al lead.", systems: ["erp"], correct: false }
     ],
     feedback: {
-      correct: "¡Perfecto! La clave es usar AMBOS sistemas: Vakko te da la data operativa real (stock, técnicos, historial) y AlgorixIA CRM automatiza el seguimiento comercial personalizado.",
-      wrong: "La respuesta correcta era verificar en Vakko ERP + activar seguimiento en AlgorixIA CRM. Usar un solo sistema deja información valiosa sin aprovechar.",
-      flow: ["Lead entra por AlgorixIA CRM →", "Consulta stock/disponibilidad en Vakko →", "Arma presupuesto con datos reales →", "AlgorixIA CRM activa secuencia de nurturing"]
+      correct: "¡Perfecto! La clave es usar AMBOS sistemas: ERP te da la data operativa real (stock, técnicos, historial) y CRM automatiza el seguimiento comercial personalizado.",
+      wrong: "La respuesta correcta era verificar en ERP + activar seguimiento en CRM. Usar un solo sistema deja información valiosa sin aprovechar.",
+      flow: ["Lead entra por CRM →", "Consulta stock/disponibilidad en ERP →", "Arma presupuesto con datos reales →", "CRM activa secuencia de nurturing"]
     }
   },
   {
-    context: "Un cliente existente, TechDrill Argentina, llama furioso. Su pedido de 50 juntas de BOP lleva 5 días de retraso. El contacto está en AlgorixIA CRM como 'cliente activo VIP'.",
-    erpData: { title: "Vakko ERP", items: ["Orden #4521: 50 juntas BOP", "Estado: En tránsito (demorado)", "ETA real: 2 días más", "Alternativa: 30 unid. en depósito local"] },
-    crmData: { title: "AlgorixIA CRM", items: ["Cliente VIP desde 2022", "Facturación anual: USD 180K", "Último NPS: 8/10", "Tickets abiertos: 1 (este)"] },
+    context: "Un cliente existente, TechDrill Argentina, llama furioso. Su pedido de 50 juntas de BOP lleva 5 días de retraso. El contacto está en CRM como 'cliente activo VIP'.",
+    erpData: { title: "ERP", items: ["Orden #4521: 50 juntas BOP", "Estado: En tránsito (demorado)", "ETA real: 2 días más", "Alternativa: 30 unid. en depósito local"] },
+    crmData: { title: "CRM", items: ["Cliente VIP desde 2022", "Facturación anual: USD 180K", "Último NPS: 8/10", "Tickets abiertos: 1 (este)"] },
     question: "¿Cómo manejás esta situación integrando ambos sistemas?",
     options: [
-      { text: "Enviar las 30 unidades del depósito local hoy vía ERP y notificar al cliente por AlgorixIA CRM que el resto llega en 2 días, activando seguimiento automático post-entrega.", systems: ["erp", "crm"], correct: true },
-      { text: "Responder por AlgorixIA CRM que el pedido está en camino y que tenga paciencia.", systems: ["crm"], correct: false },
+      { text: "Enviar las 30 unidades del depósito local hoy vía ERP y notificar al cliente por CRM que el resto llega en 2 días, activando seguimiento automático post-entrega.", systems: ["erp", "crm"], correct: true },
+      { text: "Responder por CRM que el pedido está en camino y que tenga paciencia.", systems: ["crm"], correct: false },
       { text: "Generar una orden nueva en el ERP por 50 unidades y cancelar la anterior.", systems: ["erp"], correct: false }
     ],
     feedback: {
-      correct: "¡Excelente! Solución rápida usando datos del ERP (stock alternativo en depósito) + comunicación proactiva y seguimiento automatizado desde AlgorixIA CRM.",
-      wrong: "La mejor jugada era enviar las 30 del depósito HOY (dato del ERP) y usar AlgorixIA CRM para notificar + activar seguimiento. Un cliente VIP de USD 180K no puede esperar.",
-      flow: ["AlgorixIA CRM alerta: cliente VIP con queja →", "Vakko muestra stock alternativo local →", "Despacho parcial inmediato (30 unid.) →", "AlgorixIA CRM notifica + agenda seguimiento"]
+      correct: "¡Excelente! Solución rápida usando datos del ERP (stock alternativo en depósito) + comunicación proactiva y seguimiento automatizado desde CRM.",
+      wrong: "La mejor jugada era enviar las 30 del depósito HOY (dato del ERP) y usar CRM para notificar + activar seguimiento. Un cliente VIP de USD 180K no puede esperar.",
+      flow: ["CRM alerta: cliente VIP con queja →", "ERP muestra stock alternativo local →", "Despacho parcial inmediato (30 unid.) →", "CRM notifica + agenda seguimiento"]
     }
   },
   {
-    context: "Es fin de mes y necesitás cerrar ventas. AlgorixIA CRM muestra 12 oportunidades en etapa 'Propuesta enviada' que no respondieron hace más de 7 días. Vakko tiene un lote de 200 metros de caños API 5CT que necesitás rotar.",
-    erpData: { title: "Vakko ERP", items: ["Lote caños API 5CT: 200m", "Costo unitario: USD 85/m", "Días en stock: 45", "Margen mín. rentable: USD 95/m"] },
-    crmData: { title: "AlgorixIA CRM", items: ["Oportunidades abiertas: 12", "Sin respuesta >7 días: 12", "Pipeline total: USD 340K", "Tasa cierre histórica: 23%"] },
+    context: "Es fin de mes y necesitás cerrar ventas. CRM muestra 12 oportunidades en etapa 'Propuesta enviada' que no respondieron hace más de 7 días. ERP tiene un lote de 200 metros de caños API 5CT que necesitás rotar.",
+    erpData: { title: "ERP", items: ["Lote caños API 5CT: 200m", "Costo unitario: USD 85/m", "Días en stock: 45", "Margen mín. rentable: USD 95/m"] },
+    crmData: { title: "CRM", items: ["Oportunidades abiertas: 12", "Sin respuesta >7 días: 12", "Pipeline total: USD 340K", "Tasa cierre histórica: 23%"] },
     question: "¿Cómo combinás ERP y CRM para cerrar el mes?",
     options: [
-      { text: "Hacer descuento masivo en caños desde el ERP y mandar email genérico a toda la base de AlgorixIA CRM.", systems: ["erp", "crm"], correct: false },
-      { text: "Filtrar en AlgorixIA CRM las oportunidades que incluyen caños, cruzar con margen del ERP, y enviar oferta personalizada con precio especial por cierre de stock.", systems: ["erp", "crm"], correct: true },
+      { text: "Hacer descuento masivo en caños desde el ERP y mandar email genérico a toda la base de CRM.", systems: ["erp", "crm"], correct: false },
+      { text: "Filtrar en CRM las oportunidades que incluyen caños, cruzar con margen del ERP, y enviar oferta personalizada con precio especial por cierre de stock.", systems: ["erp", "crm"], correct: true },
       { text: "Llamar a las 12 oportunidades una por una manualmente sin consultar datos.", systems: [], correct: false }
     ],
     feedback: {
       correct: "¡Crack! Cruzaste datos de inventario (ERP) con el pipeline comercial (CRM) para crear una oferta quirúrgica: solo a quienes les interesa, con un precio que respeta tu margen.",
-      wrong: "La jugada era CRUZAR datos: filtrar en AlgorixIA CRM quién necesita caños + ver en Vakko el margen mínimo = oferta personalizada y rentable.",
-      flow: ["AlgorixIA CRM filtra leads interesados en caños →", "Vakko calcula precio mín. rentable (USD 95/m) →", "Oferta personalizada con urgencia de stock →", "AlgorixIA CRM automatiza seguimiento y cierre"]
+      wrong: "La jugada era CRUZAR datos: filtrar en CRM quién necesita caños + ver en ERP el margen mínimo = oferta personalizada y rentable.",
+      flow: ["CRM filtra leads interesados en caños →", "ERP calcula precio mín. rentable (USD 95/m) →", "Oferta personalizada con urgencia de stock →", "CRM automatiza seguimiento y cierre"]
     }
   },
   {
     context: "Tu equipo de ventas informa que 3 empresas nuevas del sector fracking preguntaron por servicios de coiled tubing esta semana. Ninguna está cargada en el sistema todavía.",
-    erpData: { title: "Vakko ERP", items: ["Unidades coiled tubing: 2 operativas", "Agenda próx. 15 días: 60% ocupada", "Precio base servicio: USD 12.500", "Último mantenimiento: OK"] },
-    crmData: { title: "AlgorixIA CRM", items: ["Contactos sector fracking: 47", "Campaña activa: Ninguna", "Tasa conversión sector: 31%", "Template 'Bienvenida': disponible"] },
+    erpData: { title: "ERP", items: ["Unidades coiled tubing: 2 operativas", "Agenda próx. 15 días: 60% ocupada", "Precio base servicio: USD 12.500", "Último mantenimiento: OK"] },
+    crmData: { title: "CRM", items: ["Contactos sector fracking: 47", "Campaña activa: Ninguna", "Tasa conversión sector: 31%", "Template 'Bienvenida': disponible"] },
     question: "¿Cómo onboardeás estos leads de forma eficiente?",
     options: [
-      { text: "Cargar los 3 contactos en AlgorixIA CRM, enviar template de bienvenida, y crear oportunidades vinculadas a la disponibilidad real de coiled tubing desde Vakko.", systems: ["erp", "crm"], correct: true },
+      { text: "Cargar los 3 contactos en CRM, enviar template de bienvenida, y crear oportunidades vinculadas a la disponibilidad real de coiled tubing desde ERP.", systems: ["erp", "crm"], correct: true },
       { text: "Agendar reuniones directamente sin cargar en ningún sistema.", systems: [], correct: false },
       { text: "Cargar solo en el ERP como potenciales órdenes de trabajo.", systems: ["erp"], correct: false }
     ],
     feedback: {
-      correct: "¡Muy bien! Primero el CRM captura y nutre (AlgorixIA CRM), y al mismo tiempo el ERP te dice si realmente podés cumplir (agenda 60% ocupada = podés tomar 2-3 servicios más).",
-      wrong: "Lo ideal era cargar en AlgorixIA CRM (nurturing automatizado) + cruzar con Vakko (¿tenés capacidad real?). Sin CRM perdés seguimiento; sin ERP prometés lo que no podés cumplir.",
-      flow: ["Cargar leads en AlgorixIA CRM →", "Activar secuencia de bienvenida →", "Vakko confirma disponibilidad de equipos →", "AlgorixIA CRM crea oportunidad con datos operativos reales"]
+      correct: "¡Muy bien! Primero el CRM captura y nutre (CRM), y al mismo tiempo el ERP te dice si realmente podés cumplir (agenda 60% ocupada = podés tomar 2-3 servicios más).",
+      wrong: "Lo ideal era cargar en CRM (nurturing automatizado) + cruzar con ERP (¿tenés capacidad real?). Sin CRM perdés seguimiento; sin ERP prometés lo que no podés cumplir.",
+      flow: ["Cargar leads en CRM →", "Activar secuencia de bienvenida →", "ERP confirma disponibilidad de equipos →", "CRM crea oportunidad con datos operativos reales"]
     }
   },
   {
-    context: "AlgorixIA CRM dispara una alerta: el NPS de tu cliente más grande, YPF Servicios, bajó de 9 a 6 en la última encuesta. Facturan USD 500K/año con vos.",
-    erpData: { title: "Vakko ERP", items: ["Órdenes YPF últ. 90 días: 8", "Entregas a tiempo: 5/8 (62%)", "Reclamos abiertos: 2", "Próx. factura: USD 45K (vence en 10 días)"] },
-    crmData: { title: "AlgorixIA CRM", items: ["NPS actual: 6 (era 9)", "Contacto clave: Ing. Ruiz", "Últ. interacción: hace 21 días", "Renovación contrato: en 60 días"] },
+    context: "CRM dispara una alerta: el NPS de tu cliente más grande, YPF Servicios, bajó de 9 a 6 en la última encuesta. Facturan USD 500K/año con vos.",
+    erpData: { title: "ERP", items: ["Órdenes YPF últ. 90 días: 8", "Entregas a tiempo: 5/8 (62%)", "Reclamos abiertos: 2", "Próx. factura: USD 45K (vence en 10 días)"] },
+    crmData: { title: "CRM", items: ["NPS actual: 6 (era 9)", "Contacto clave: Ing. Ruiz", "Últ. interacción: hace 21 días", "Renovación contrato: en 60 días"] },
     question: "¿Qué hacés con esta información cruzada?",
     options: [
       { text: "Esperar a la renovación del contrato para hablar del tema.", systems: [], correct: false },
-      { text: "Mandar una encuesta más detallada por AlgorixIA CRM para entender mejor.", systems: ["crm"], correct: false },
-      { text: "Resolver los 2 reclamos en Vakko, contactar al Ing. Ruiz personalmente con plan de acción concreto, y activar en AlgorixIA CRM una secuencia de retención antes de la renovación.", systems: ["erp", "crm"], correct: true }
+      { text: "Mandar una encuesta más detallada por CRM para entender mejor.", systems: ["crm"], correct: false },
+      { text: "Resolver los 2 reclamos en ERP, contactar al Ing. Ruiz personalmente con plan de acción concreto, y activar en CRM una secuencia de retención antes de la renovación.", systems: ["erp", "crm"], correct: true }
     ],
     feedback: {
       correct: "¡Impecable! El ERP te mostró la causa (62% entregas a tiempo + 2 reclamos abiertos) y el CRM te dio la urgencia (renovación en 60 días). Acción inmediata en ambos frentes.",
-      wrong: "La data era clarísima: Vakko mostraba el PROBLEMA (entregas tarde + reclamos) y AlgorixIA CRM la URGENCIA (renovación en 60 días). Esperar o encuestar cuando ya sabés la causa es perder tiempo.",
-      flow: ["AlgorixIA CRM alerta NPS bajo →", "Vakko revela causa raíz: entregas y reclamos →", "Resolver reclamos operativos YA →", "AlgorixIA CRM activa retención pre-renovación"]
+      wrong: "La data era clarísima: ERP mostraba el PROBLEMA (entregas tarde + reclamos) y CRM la URGENCIA (renovación en 60 días). Esperar o encuestar cuando ya sabés la causa es perder tiempo.",
+      flow: ["CRM alerta NPS bajo →", "ERP revela causa raíz: entregas y reclamos →", "Resolver reclamos operativos YA →", "CRM activa retención pre-renovación"]
     }
   },
   {
-    context: "Lunes a la mañana. Necesitás planificar la semana del equipo comercial (4 vendedores). AlgorixIA CRM tiene el pipeline actualizado y Vakko tiene la capacidad operativa real.",
-    erpData: { title: "Vakko ERP", items: ["Capacidad semanal: 15 servicios", "Comprometidos: 9 servicios", "Disponible: 6 servicios", "Técnicos libres: 4/8"] },
-    crmData: { title: "AlgorixIA CRM", items: ["Oportunidades calientes: 8", "Propuestas pendientes: 14", "Citas agendadas: 5", "Leads nuevos sin asignar: 11"] },
+    context: "Lunes a la mañana. Necesitás planificar la semana del equipo comercial (4 vendedores). CRM tiene el pipeline actualizado y ERP tiene la capacidad operativa real.",
+    erpData: { title: "ERP", items: ["Capacidad semanal: 15 servicios", "Comprometidos: 9 servicios", "Disponible: 6 servicios", "Técnicos libres: 4/8"] },
+    crmData: { title: "CRM", items: ["Oportunidades calientes: 8", "Propuestas pendientes: 14", "Citas agendadas: 5", "Leads nuevos sin asignar: 11"] },
     question: "¿Cómo planificás la semana con estos datos?",
     options: [
       { text: "Que cada vendedor trabaje sus leads como siempre, sin mirar la capacidad operativa.", systems: ["crm"], correct: false },
-      { text: "Priorizar las 8 oportunidades calientes en AlgorixIA CRM, asegurando que solo se cierren hasta 6 servicios nuevos (capacidad real de Vakko), y asignar leads según disponibilidad.", systems: ["erp", "crm"], correct: true },
+      { text: "Priorizar las 8 oportunidades calientes en CRM, asegurando que solo se cierren hasta 6 servicios nuevos (capacidad real de ERP), y asignar leads según disponibilidad.", systems: ["erp", "crm"], correct: true },
       { text: "Frenar las ventas hasta que se libere más capacidad en el ERP.", systems: ["erp"], correct: false }
     ],
     feedback: {
       correct: "¡Perfecto! Planificación inteligente: el CRM dice DÓNDE están las oportunidades, el ERP dice CUÁNTO podés absorber. Vender más de lo que podés cumplir es peor que no vender.",
-      wrong: "La clave era alinear ventas con capacidad: AlgorixIA CRM tiene 8 oportunidades calientes, pero Vakko solo puede absorber 6 servicios más.",
-      flow: ["AlgorixIA CRM muestra pipeline priorizado →", "Vakko define techo de capacidad (6 servicios) →", "Asignar vendedores a las 8 calientes →", "Cerrar máximo 6, nurturing al resto para próxima semana"]
+      wrong: "La clave era alinear ventas con capacidad: CRM tiene 8 oportunidades calientes, pero ERP solo puede absorber 6 servicios más.",
+      flow: ["CRM muestra pipeline priorizado →", "ERP define techo de capacidad (6 servicios) →", "Asignar vendedores a las 8 calientes →", "Cerrar máximo 6, nurturing al resto para próxima semana"]
     }
   }
 ];
@@ -877,7 +887,7 @@ function showErpResults() {
     </div>
     <div style="background:var(--dark-mid);border-radius:16px;padding:20px;margin-bottom:16px;font-size:14px;line-height:1.6;color:rgba(255,255,255,0.8)">
       <strong style="color:var(--white)">¿Qué aprendimos?</strong><br><br>
-      Cuando el <span style="color:#a78bfa;font-weight:600">ERP (Vakko)</span> y el <span style="color:#22d3ee;font-weight:600">CRM (AlgorixIA CRM)</span> trabajan conectados, cada decisión se toma con datos reales.<br><br>
+      Cuando el <span style="color:#a78bfa;font-weight:600">ERP</span> y el <span style="color:#22d3ee;font-weight:600">CRM</span> trabajan conectados, cada decisión se toma con datos reales.<br><br>
       <strong>El ERP te dice qué podés hacer.</strong><br>
       <strong>El CRM te dice a quién y cómo.</strong><br>
       <strong>Juntos te dicen cuándo y por qué.</strong>
@@ -939,7 +949,6 @@ function addBubble(containerId, type, text) {
   chat.scrollTop = chat.scrollHeight;
   return id;
 }
-
 
 // ===================================================================
 // COMPLAINT GAME
